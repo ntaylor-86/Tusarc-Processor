@@ -1,33 +1,35 @@
 # ----------------------------------------------------------
 # Imports
 # ----------------------------------------------------------
-Import-Module -Force $PSScriptRoot\LstFinder.ps1
+Import-Module -Force $PSScriptRoot\FabApi.ps1
 Import-Module -Force $PSScriptRoot\TusarcProcessor.ps1
 Import-Module -Force $PSScriptRoot\FileDiffer.ps1
 
 # ----------------------------------------------------------
 # Program Variables
 # ----------------------------------------------------------
-$LstDirectory = ""  # The root directory to where your .LST's are
+$FAB_BASE_DIR = ""
+$FAB_API_URL = ""
+$TEAMS_WEBHOOK_URL = ""
+
 
 # ----------------------------------------------------------
 # Main
 # ----------------------------------------------------------
-$LstFinder = [LstFinder]::new()
-$LstFinder.baseDirectory = $LstDirectory
+$FabApi = [FabApi]::new()
+$FabApi.URI = $FAB_API_URL
+$latestNests = $FabApi.GetLatestNests()
 
-$filesToProcess = $LstFinder.returnNewLsts()
-
-foreach ($lst in $filesToProcess) {
-    $fileName = Split-Path $lst.FullName -Leaf
+foreach ($lst in $latestNests) {
+    $fileName = Split-Path $lst.LstPath -Leaf
     $fileNameNoExt = $fileName.Replace(".LST", "")
     $originalFile = $($PWD.Path + "\TEMP\" + $fileName)
     $modifiedFile = $($PWD.Path + "\TEMP\" + $fileNameNoExt + "_MODIFIED.LST")
-    
-    Write-Host $fileName
 
-    # Copy .LST from the $LstDirectory to the TEMP directory
-    Copy-Item -Path $lst.FullName -Destination $($PWD.Path + "\TEMP")
+    Write-Host $fileName
+    
+    # Copy the .LST from the FAB_BASE_DIR + the path from the FAB database for the Job
+    Copy-Item -Path $($FAB_BASE_DIR + $lst.LstPath)  -Destination $($PWD.Path + "\TEMP")
     # Copy and rename the file
     Copy-Item -Path $originalFile -Destination $modifiedFile
     
