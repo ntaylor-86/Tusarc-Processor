@@ -1,11 +1,10 @@
 class FabApi
 {
-    # [string] $URI = "http://fab-api.gci.local/api/programmed-nests"
-    [string] $URI
+    [string] $URL
     
     [array] GetLatestNests()
     {
-        $response = Invoke-RestMethod -Uri $this.URI
+        $response = Invoke-RestMethod -Uri $this.URL
         
         return $response.data
     }
