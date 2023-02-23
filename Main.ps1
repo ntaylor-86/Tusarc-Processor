@@ -4,6 +4,7 @@
 Import-Module -Force $PSScriptRoot\FabApi.ps1
 Import-Module -Force $PSScriptRoot\TusarcProcessor.ps1
 Import-Module -Force $PSScriptRoot\FileDiffer.ps1
+Import-Module -Force $PSScriptRoot\TeamsNotification.ps1
 
 # ----------------------------------------------------------
 # Program Variables
@@ -29,7 +30,7 @@ foreach ($lst in $latestNests) {
     Write-Host $fileName
     
     # Copy the .LST from the FAB_BASE_DIR + the path from the FAB database for the Job
-    Copy-Item -Path $($FAB_BASE_DIR + $lst.LstPath)  -Destination $($PWD.Path + "\TEMP")
+    Copy-Item -Path $($FAB_BASE_DIR + "\" + $lst.LstPath)  -Destination $($PWD.Path + "\TEMP")
     # Copy and rename the file
     Copy-Item -Path $originalFile -Destination $modifiedFile
     
@@ -38,7 +39,7 @@ foreach ($lst in $latestNests) {
     $TusarcProcessor.inputFile = $modifiedFile
     $TusarcProcessor.processFile()
     
-    Start-Sleep -s 1 
+    Start-Sleep -s 3
     
     # Compare the origianl & modified file
     $FileDiffer = [FileDiffer]::new()
@@ -52,6 +53,11 @@ foreach ($lst in $latestNests) {
     }
     
     Write-Host "Files are different!"
+    
+    $TeamsNotification = [TeamsNotification]::new()
+    $TeamsNotification.webHookUrl = $TEAMS_WEBHOOK_URL
+    $TeamsNotification.lstThatHasNotBeenTusarc5 = $fileName
+    $TeamsNotification.sendNotification()
 }
 
 Exit
