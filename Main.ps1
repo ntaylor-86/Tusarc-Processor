@@ -39,7 +39,7 @@ foreach ($lst in $latestNests) {
     $TusarcProcessor.inputFile = $modifiedFile
     $TusarcProcessor.processFile()
     
-    Start-Sleep -s 3
+    Start-Sleep -s 1 
     
     # Compare the origianl & modified file
     $TusarcChecker = [TusarcChecker]::new()

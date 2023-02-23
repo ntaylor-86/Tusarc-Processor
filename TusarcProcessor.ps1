@@ -4,6 +4,6 @@ class TusarcProcessor
 
     [void] processFile()
     {
-        Start-Process -FilePath $($PWD.Path + "\TUSARC5.exe") -ArgumentList $($this.inputFile) -NoNewWindow
+        Start-Process -FilePath $($PWD.Path + "\TUSARC5.exe") -ArgumentList $($this.inputFile) -NoNewWindow -Wait
     }
 }
