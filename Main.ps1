@@ -48,10 +48,10 @@ foreach ($lst in $latestNests) {
 
     if ($TusarcChecker.ModifiedFileIsDifferent() -eq $true) {
         Write-Host "Files are different!"
-        # $TeamsNotification = [TeamsNotification]::new()
-        # $TeamsNotification.webHookUrl = $TEAMS_WEBHOOK_URL
-        # $TeamsNotification.lstThatHasNotBeenTusarc5 = $fileName
-        # $TeamsNotification.sendNotification()
+        $TeamsNotification = [TeamsNotification]::new()
+        $TeamsNotification.webHookUrl = $TEAMS_WEBHOOK_URL
+        $TeamsNotification.lstThatHasNotBeenTusarc5 = $fileName
+        $TeamsNotification.sendNotification()
     }
 
     # Delete the .LST's from the TEMP dir
