@@ -9,11 +9,11 @@ Import-Module -Force $PSScriptRoot\TeamsNotification.ps1
 # ----------------------------------------------------------
 # Program Variables
 # ----------------------------------------------------------
-$BASE_DIR = "C:\laragon\www\Tusarc-Processor"
-$TEMP_DIR = "C:\laragon\www\Tusarc-Processor\TEMP"
-$FAB_BASE_DIR = "\\gci-trumpf\Archiv"
-$FAB_API_URL = "http://fab-api.gci.local/api/programmed-nests"
-$TEAMS_WEBHOOK_URL = "https://rbcducentis.webhook.office.com/webhookb2/dbeffb7f-afef-49bd-a1ee-1142f77c035b@be25322c-847f-46c3-a099-1b03657ef136/IncomingWebhook/c39973ba441f4f70a66083e047adee31/26992479-89dc-46bc-99c7-8f0cd5c4c1b9"
+$BASE_DIR = ""
+$TEMP_DIR = ""
+$FAB_BASE_DIR = ""
+$FAB_API_URL = ""
+$TEAMS_WEBHOOK_URL = ""
 
 
 # ----------------------------------------------------------
