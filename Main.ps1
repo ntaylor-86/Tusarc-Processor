@@ -1,4 +1,16 @@
 # ----------------------------------------------------------
+# Only execute the script between
+# the hours of 07:00 and 18:00
+# ----------------------------------------------------------
+$min = Get-Date '07:00'
+$max = Get-Date '18:00'
+$now = Get-Date
+
+if ( $now.TimeOfDay -le $min.TimeOfDay -or $now.TimeOfDay -ge $max.TimeOfDay ) {
+    Exit
+}
+
+# ----------------------------------------------------------
 # Imports
 # ----------------------------------------------------------
 Import-Module -Force $PSScriptRoot\FabApi.ps1
