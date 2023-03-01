@@ -1,4 +1,33 @@
 # ----------------------------------------------------------
+# Program Variables
+# ----------------------------------------------------------
+$BASE_DIR = ""
+$TEMP_DIR = ""
+$FAB_BASE_DIR = ""
+$FAB_API_URL = ""
+$TEAMS_WEBHOOK_URL = ""
+$SEND_CHECK_IN = $true
+$CHECK_IN_URL=""
+
+# ----------------------------------------------------------
+# Imports
+# ----------------------------------------------------------
+Import-Module -Force $PSScriptRoot\CheckIn.ps1
+Import-Module -Force $PSScriptRoot\FabApi.ps1
+Import-Module -Force $PSScriptRoot\TusarcProcessor.ps1
+Import-Module -Force $PSScriptRoot\TusarcChecker.ps1
+Import-Module -Force $PSScriptRoot\TeamsNotification.ps1
+
+# ----------------------------------------------------------
+# Sending the Check-In to HoneyBadger (optional)
+# ----------------------------------------------------------
+if ( $SEND_CHECK_IN ) {
+    $CheckIn = [CheckIn]::new()
+    $CheckIn.Url = $CHECK_IN_URL
+    $CheckIn.sendCheckIn()
+}
+
+# ----------------------------------------------------------
 # Only execute the script between
 # the hours of 07:00 and 18:00
 # ----------------------------------------------------------
@@ -9,24 +38,6 @@ $now = Get-Date
 if ( $now.TimeOfDay -le $min.TimeOfDay -or $now.TimeOfDay -ge $max.TimeOfDay ) {
     Exit
 }
-
-# ----------------------------------------------------------
-# Imports
-# ----------------------------------------------------------
-Import-Module -Force $PSScriptRoot\FabApi.ps1
-Import-Module -Force $PSScriptRoot\TusarcProcessor.ps1
-Import-Module -Force $PSScriptRoot\TusarcChecker.ps1
-Import-Module -Force $PSScriptRoot\TeamsNotification.ps1
-
-# ----------------------------------------------------------
-# Program Variables
-# ----------------------------------------------------------
-$BASE_DIR = ""
-$TEMP_DIR = ""
-$FAB_BASE_DIR = ""
-$FAB_API_URL = ""
-$TEAMS_WEBHOOK_URL = ""
-
 
 # ----------------------------------------------------------
 # Main
@@ -66,6 +77,7 @@ foreach ($lst in $latestNests) {
         $TeamsNotification = [TeamsNotification]::new()
         $TeamsNotification.webHookUrl = $TEAMS_WEBHOOK_URL
         $TeamsNotification.lstThatHasNotBeenTusarc5 = $fileName
+        $TeamsNotification.checkedBy = $lst.CheckedBy
         $TeamsNotification.sendNotification()
     }
 
