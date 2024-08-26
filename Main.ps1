@@ -47,6 +47,11 @@ $FabApi.URL = $FAB_API_URL
 $latestNests = $FabApi.GetLatestNests()
 
 foreach ($lst in $latestNests) {
+    # Ignoring Jobs where the FAB Workplace is the Combination machine
+    if ($lst.Workplace -eq "TM6000-1") {
+        continue
+    }
+
     $fileName = Split-Path $lst.LstPath -Leaf
     $fileNameNoExt = $fileName.Replace(".LST", "")
     $originalFile = $($TEMP_DIR + "\" + $fileName)
