@@ -47,43 +47,52 @@ $FabApi.URL = $FAB_API_URL
 $latestNests = $FabApi.GetLatestNests()
 
 foreach ($lst in $latestNests) {
-    $fileName = Split-Path $lst.LstPath -Leaf
-    $fileNameNoExt = $fileName.Replace(".LST", "")
-    $originalFile = $($TEMP_DIR + "\" + $fileName)
-    $modifiedFile = $($TEMP_DIR + "\" + $fileNameNoExt + "_MODIFIED.LST")
-
-    Write-Host $fileName
-    
-    # Copy the .LST from the FAB_BASE_DIR + the path from the FAB database for the Job into the TEMP dir
-    Copy-Item -Path $($FAB_BASE_DIR + "\" + $lst.LstPath)  -Destination $TEMP_DIR
-    # Copy and rename the file that TUSARC5 will process
-    Copy-Item -Path $originalFile -Destination $modifiedFile
-    
-    # Run the TUSARC5 processor on the modified file
-    $TusarcProcessor = [TusarcProcessor]::new()
-    $TusarcProcessor.baseDirectory = $BASE_DIR
-    $TusarcProcessor.inputFile = $modifiedFile
-    $TusarcProcessor.processFile()
-    
-    Start-Sleep -s 1 
-    
-    # Compare the origianl & modified file
-    $TusarcChecker = [TusarcChecker]::new()
-    $TusarcChecker.sourceFile = $originalFile
-    $TusarcChecker.modifiedFile = $modifiedFile
-
-    if ($TusarcChecker.ModifiedFileIsDifferent() -eq $true) {
-        Write-Host "Files are different!"
-        $TeamsNotification = [TeamsNotification]::new()
-        $TeamsNotification.webHookUrl = $TEAMS_WEBHOOK_URL
-        $TeamsNotification.lstThatHasNotBeenTusarc5 = $fileName
-        $TeamsNotification.checkedBy = $lst.CheckedBy
-        $TeamsNotification.sendNotification()
+    $SEL = Select-String -Pattern "TM6000-1" -InputObject $lst
+    if($SEL -ne $null){
+        $fileName = Split-Path $lst.LstPath -Leaf
+        Write-Host $fileName
+        Write-Host "Is TruMatic 6000"
+        Write-Host "Skipping"
     }
-
-    # Delete the .LST's from the TEMP dir
-    Remove-Item -Path $originalFile
-    Remove-Item -Path $modifiedFile
+    else{
+        $fileName = Split-Path $lst.LstPath -Leaf
+        $fileNameNoExt = $fileName.Replace(".LST", "")
+        $originalFile = $($TEMP_DIR + "\" + $fileName)
+        $modifiedFile = $($TEMP_DIR + "\" + $fileNameNoExt + "_MODIFIED.LST")
+    
+        Write-Host $fileName
+        
+        # Copy the .LST from the FAB_BASE_DIR + the path from the FAB database for the Job into the TEMP dir
+        Copy-Item -Path $($FAB_BASE_DIR + "\" + $lst.LstPath)  -Destination $TEMP_DIR
+        # Copy and rename the file that TUSARC5 will process
+        Copy-Item -Path $originalFile -Destination $modifiedFile
+        
+        # Run the TUSARC5 processor on the modified file
+        $TusarcProcessor = [TusarcProcessor]::new()
+        $TusarcProcessor.baseDirectory = $BASE_DIR
+        $TusarcProcessor.inputFile = $modifiedFile
+        $TusarcProcessor.processFile()
+        
+        Start-Sleep -s 1 
+        
+        # Compare the origianl & modified file
+        $TusarcChecker = [TusarcChecker]::new()
+        $TusarcChecker.sourceFile = $originalFile
+        $TusarcChecker.modifiedFile = $modifiedFile
+    
+        if ($TusarcChecker.ModifiedFileIsDifferent() -eq $true) {
+            Write-Host "Files are different!"
+            $TeamsNotification = [TeamsNotification]::new()
+            $TeamsNotification.webHookUrl = $TEAMS_WEBHOOK_URL
+            $TeamsNotification.lstThatHasNotBeenTusarc5 = $fileName
+            $TeamsNotification.checkedBy = $lst.CheckedBy
+            $TeamsNotification.sendNotification()
+        }
+    
+        # Delete the .LST's from the TEMP dir
+        Remove-Item -Path $originalFile
+        Remove-Item -Path $modifiedFile
+    }
 }
 
 Exit
